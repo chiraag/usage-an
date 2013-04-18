@@ -26,9 +26,8 @@ def setcolumn(col_id, width, text):
 
 def insertnode(node, node_name='/', parent_id='', parent_name=''):
     node_full_name = parent_name + '/' + node_name
-    val = round(node.total, 3), round(node.local, 3)
     
-    node_id = tv.insert(parent_id, 'end', node_full_name, text=node_name, values=val)
+    node_id = tv.insert(parent_id, 'end', node_full_name, text=node_name, values=node.value)
     
     for (name, branch) in node.iterbranches():
         insertnode(branch, name, node_id, node_full_name)
