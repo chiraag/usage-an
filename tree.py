@@ -1,4 +1,6 @@
-def tree(init_val, parent_update=lambda: None, ancestor_update=lambda: None):
+def _do_nothing(x, y): pass
+
+def tree(init_val=None, parent_update=_do_nothing, ancestor_update=_do_nothing):
     class MyTree(dict):
         """ 
         Every node in the tree has a local value which is the sum of all 
@@ -11,42 +13,38 @@ def tree(init_val, parent_update=lambda: None, ancestor_update=lambda: None):
 
         def __init__(self):
             self.value = init_val
+            self.parents = []
 
         def __missing__(self, key):
             t = MyTree()
+            t.parents.append(self)
             self[key] = t
             return t
         
-        def addleaf(self, leaf_path, leaf_val):
+        def insertnode(self, node_path, node_val):
             """ 
-            Add a leaf given as [root, br1, br2, ... leaf_name] to the tree.
-            leaf_val is added as an entry to its parent tree dict.
-            Also, the parent is modified by parent_update(leaf_val)
-            All other ancestors' are modified by ancestor_update(leaf_val)
+            Add a node with path given as list of successive indices.
+            Also, the parent is modified by parent_update(node_val)
+            All other ancestors' are modified by ancestor_update(node_val)
             """
+            # Get parent of node to be added
+            parent = self
+            for br_name in node_path[:-1]:
+                parent._ancestor_upd(node_val)
+                parent = parent[br_name]
 
-            node = self
-            for br_name in leaf_path[:-1]:
-                node._ancestor_upd(leaf_val)
-                node = node[br_name]
-                if not isinstance(node, MyTree):
-                    raise ValueError('Trying to add a leaf as child to another leaf')
+            node_name = node_path[-1]
 
-            leaf_name = leaf_path[-1]
-
-            if leaf_name in node:
-                # Error if leaf already exists
-                raise ValueError('{} already exists'.format(leaf_path))
+            # Error if node already exists
+            if node_name in parent:
+                raise ValueError('{} already exists'.format(node_path))
             else:
-                node._parent_upd(leaf_val)
-                node[leaf_name] = leaf_val
-
-        def iterbranches(self):
-            " Filter out the leaves at the node"
-            return (it for it in self.iteritems() if isinstance(it[1], MyTree))
-        
-        def iterleaves(self):
-            " Filter out the branches at the node"
-            return (it for it in self.iteritems() if not isinstance(it[1], MyTree))
-    
+                parent._parent_upd(node_val)
+                parent[node_name] = node_val
+                # Try to register parent in node_val's list of parents
+                try:
+                    node_val.parents.append(parent)
+                except AttributeError:
+                    pass
+   
     return MyTree
