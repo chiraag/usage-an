@@ -1,3 +1,8 @@
+""" 
+Every node in the tree has a local value which is the sum of all 
+leaves at that node and a total value which is sum of the local value
+total values of all its branches 
+"""
 from itertools import ifilterfalse
 import tree
 
@@ -9,7 +14,7 @@ def _parent_update(node, leaf_val):
     total, local = node.value
     node.value = total + leaf_val, local + leaf_val
 
-_tree_class = tree.tree((0 , 0), _parent_update, _ancestor_update)
+_tree_class = tree.tree((0,0), _parent_update, _ancestor_update)
 
 def branches(node):
     return (it for it in node.iteritems() if isinstance(it[1], _tree_class))
@@ -25,7 +30,6 @@ def tree_from_report(file_name):
 
     root = _tree_class()
     addleaf = root.insertnode
-    
     fin = open(file_name, 'r')
     
     for l in ifilterfalse(lambda l: l.startswith('*'), fin):

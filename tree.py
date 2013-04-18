@@ -2,11 +2,6 @@ def _do_nothing(x, y): pass
 
 def tree(init_val=None, parent_update=_do_nothing, ancestor_update=_do_nothing):
     class MyTree(dict):
-        """ 
-        Every node in the tree has a local value which is the sum of all 
-        leaves at that node and a total value which is sum of the local value
-        total values of all its branches 
-        """
         _init_val = init_val
         _parent_upd = parent_update
         _ancestor_upd = ancestor_update
