@@ -18,23 +18,25 @@ rptfile = args['<report-file>']
 
 window = tk.Tk()
 window.title(rptfile)
-tv = ttk.Treeview(window, columns=('total', 'local'), height=30, padding=2)
+tv = ttk.Treeview(window, columns=('total', ), height=30, padding=2)
 
 def setcolumn(col_id, width, text):
     tv.column(col_id, width=width)
     tv.heading(col_id, text=text)
 
-def insertnode(node, node_name='/', parent_id='', parent_name=''):
-    node_full_name = parent_name + '/' + node_name
+def insertnode(node, parent_id='', parent_name=''):
+    # print node.name
+    node_full_name = parent_name + node.name + '/'
     
-    node_id = tv.insert(parent_id, 'end', node_full_name, text=node_name, values=node.value)
+    node_id = tv.insert(parent_id, 'end', node_full_name, text=node.name, values=node.value)
     
-    for (name, branch) in branches(node):
-        insertnode(branch, name, node_id, node_full_name)
+    # print node
+    for child in node:
+        # print child
+        insertnode(node[child], node_id, node_full_name)
 
-setcolumn('#0', width=500, text='Module')
-setcolumn('total', width=100, text='Total power')
-setcolumn('local', width=100, text='Local power')
+setcolumn('#0', width=500, text='Folder')
+setcolumn('total', width=100, text='Total Size')
 
 root = tree_from_report(rptfile)
 insertnode(root)
